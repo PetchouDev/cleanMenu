@@ -1,4 +1,5 @@
 import os
+import subprocess
 import sys
 
 from termcolor import colored, cprint
@@ -27,8 +28,10 @@ class Menu:
                  pointer_color="green",  # pointer color
                  pointed_text_color="white",  # pointed option text color
                  pointed_background_color="None",  # pointed option background color
+                 validate_key="enter",  # key to validate the choice
                  ):
-        self.title = colored(title, title_color) if art_title is False else colored(t2a(title, font=title_font), title_color)
+        self.title = colored(title, title_color) if art_title is False else colored(t2a(title, font=title_font),
+                                                                                    title_color)
         self.options = options if exit_text is None else options + [exit_text]
         self.pointer = default_pointer_index
         if not 0 <= self.pointer <= len(self.options) - 1:
@@ -50,6 +53,8 @@ class Menu:
         if exit_text in self.options:
             self.actions[str(self.options.index(exit_text))] = exit_function
         self.has_exit = True if exit_text in self.options else False
+        self.validate_key = Key.space if validate_key == "space" else Key.enter
+        self.validate_key_code = 32 if validate_key == "space" else 13
 
     # displays the menu
     def _print(self):
@@ -87,6 +92,7 @@ class Menu:
         if key == Key.up and self.running is True:
             # point to upper item
             self.pointer = self.pointer - 1 if self.pointer > 0 else len(self.options) - 1
+
             self._print()
         if key == Key.down and self.running is True:
             # point to lower item
@@ -116,10 +122,21 @@ class Menu:
     def _error_message(self, title, message):
         print(f"{colored(title, 'red')}: {message}")
 
+    # prevent from running previous commands by blocking arrows up and down propagation
+    def win32_event_filter(self, msg, data):
+        if (msg == 257 or msg == 256) and data.vkCode in [self.validate_key_code, 13, 38, 40]:  # enter, down, up
+            self.listener._suppress = True
+            print(data.vkCode)
+            input()
+            return True
+        else:
+            self.listener._suppress = False
+            return True
+
     def _run(self):
         self._print()
         self.running = True
-        self.listener = Listener(on_press=self._on_press)
+        self.listener = Listener(on_press=self._on_press, supress=True, win32_event_filter=self.win32_event_filter)
         self.listener.start()
         self.listener.join()
         return self.pointer
@@ -134,7 +151,7 @@ class Menu:
 def example():
     print("Example function")
     menu = Menu("Test",
-                ["Option 1", "Option 2", "Option 3"],
+                ["Option 1", "Option 2", "Option 3", "Option 4", "Option 5"],
                 title_font="rounded",
                 title_color="blue",
                 margin="        ",
@@ -150,6 +167,7 @@ def example():
     menu.bind(1, lambda: print("Option 2"))
     menu.bind(2, lambda: print("Option 3"))
     menu.bind(3, lambda: print("Option 4"))
+    menu.bind(4, lambda: print("Option 5"))
 
     menu.run()
 

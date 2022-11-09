@@ -95,6 +95,8 @@ ipython_config.py
 #Pipfile.lock
 
 # poetry
+poetry.lock
+poetry.toml
 #   Similar to Pipfile.lock, it is generally recommended to include poetry.lock in version control.
 #   This is especially recommended for binary packages to ensure reproducibility, and is more
 #   commonly ignored for libraries.
@@ -145,6 +147,7 @@ dmypy.json
 cython_debug/
 
 # PyCharm
+.idea/
 #  JetBrains specific template is maintainted in a separate JetBrains.gitignore that can
 #  be found at https://github.com/github/gitignore/blob/main/Global/JetBrains.gitignore
 #  and can be added to the global gitignore or merged into this file.  For a more nuclear
