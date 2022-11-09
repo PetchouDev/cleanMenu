@@ -39,7 +39,7 @@ I actually don't have a mac to test it, but I think it won't work as expected, b
 ### Create an instance 
 Simply import the `Menu` object from the package into your script and start use it.
 ```py
-from clean-menu import Menu
+from clean_menu import Menu
 
 menu = Menu(title,  # menu title
             options,  # list of options
@@ -61,7 +61,7 @@ menu = Menu(title,  # menu title
 
 so the following code :
 ```py
-from clean-menu import Menu
+from clean_menu import Menu
 
 menu = Menu("Test",
             ["Option 1", "Option 2", "Option 3"],
