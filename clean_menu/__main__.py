@@ -1,5 +1,4 @@
 import os
-import subprocess
 import sys
 
 from termcolor import colored, cprint
@@ -17,7 +16,7 @@ class Menu:
                  title,  # menu title
                  options,  # list of options
                  exit_text="Exit",  # exit text
-                 exit_function=sys.exit,  # exit function called when
+                 exit_function=None,  # exit function called when
                  art_title=True,  # enable/disable ascii art title
                  title_font="",  # ascii art title font
                  default_pointer_index=0,  # default option index in option list
@@ -49,9 +48,9 @@ class Menu:
             self.pointer_len = len(pointer_style[0]) if isinstance(pointer_style, list) else len(pointer_style)
         self.pointed_text_color = pointed_text_color
         self.pointed_background_color = pointed_background_color
-        self.actions = {str(i): i for i in range(len(self.options) - 1)}
+        self.actions = {str(i): None for i in range(len(self.options) - 1)}
         if exit_text in self.options:
-            self.actions[str(self.options.index(exit_text))] = exit_function
+            self.actions[f"{self.options.index(exit_text)}"] = self._exit if exit_function is None else exit_function
         self.has_exit = True if exit_text in self.options else False
         self.validate_key = Key.space if validate_key == "space" else Key.enter
         self.validate_key_code = 32 if validate_key == "space" else 13
@@ -99,13 +98,6 @@ class Menu:
             self.pointer = self.pointer + 1 if self.pointer < len(self.options) - 1 else 0
             self._print()
         if key == Key.enter and self.running is True:
-            # prevent from running previous commands
-            c = Controller()
-            self.running = False
-            for _ in range(100):
-                c.press(Key.down)
-                c.release(Key.down)
-            del c
             self.listener.stop()
 
     def bind(self, option_index, func):
@@ -123,20 +115,23 @@ class Menu:
         print(f"{colored(title, 'red')}: {message}")
 
     # prevent from running previous commands by blocking arrows up and down propagation
-    def win32_event_filter(self, msg, data):
+    def _win32_event_filter(self, msg, data):
         if (msg == 257 or msg == 256) and data.vkCode in [self.validate_key_code, 13, 38, 40]:  # enter, down, up
             self.listener._suppress = True
-            print(data.vkCode)
-            input()
             return True
         else:
             self.listener._suppress = False
             return True
 
+    def _exit(self):
+        a = os.system("cls" if platform.system() == "Windows" else "clear")
+        self.running = False
+        sys.exit()
+
     def _run(self):
         self._print()
         self.running = True
-        self.listener = Listener(on_press=self._on_press, supress=True, win32_event_filter=self.win32_event_filter)
+        self.listener = Listener(on_press=self._on_press, supress=True, win32_event_filter=self._win32_event_filter)
         self.listener.start()
         self.listener.join()
         return self.pointer
@@ -145,7 +140,12 @@ class Menu:
         return self._run()
 
     def run(self):
-        return self.actions[str(self._run())]()
+        action = self.actions[str(self._run())]
+        if action is not None:
+            return action()
+        else:
+            self._error_message("Action Error", "No action assigned to this option")
+            return None
 
 
 def example():
