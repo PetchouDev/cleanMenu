@@ -15,6 +15,8 @@ class Menu:
     def __init__(self,
                  title,  # menu title
                  options,  # list of options
+                 subtitle="",  # menu subtitle
+                 subtitle_color=None,  # subtitle color
                  exit_text="Exit",  # exit text
                  exit_function=None,  # exit function called when
                  art_title=True,  # enable/disable ascii art title
@@ -55,11 +57,16 @@ class Menu:
         self.validate_key = Key.space if validate_key == "space" else Key.enter
         self.validate_key_code = 32 if validate_key == "space" else 13
 
+        self.max_lenght = max([len(o) for o in self.options])
+
+        self.subtitle = subtitle if (subtitle_color is None or subtitle == "") else colored(subtitle, subtitle_color)
+
     # displays the menu
     def _print(self):
         # clear the screen
         a = os.system("cls" if platform.system() == "Windows" else "clear")
         print(self.title)
+        print(self.subtitle)
         for i in range(len(self.options)):
             if i == self.pointer:
                 self._print_pointed()
@@ -69,17 +76,21 @@ class Menu:
     def _print_pointed(self):
         # if pointer is a list
         if isinstance(self.pointer_style, list) and len(self.pointer_style) >= 2:
+
             pointer_left = self.pointer_style[0]
             pointer_right = self.pointer_style[1]
 
             pointed_text = (self.margin[:len(self.margin) - self.pointer_len]
                             + pointer_left
                             + colored(
-                self.options[self.pointer], self.pointed_text_color,
+                self.options[self.pointer] + (" "*(self.max_lenght - len(self.options[self.pointer]))),
+                self.pointed_text_color,
                 f"on_{self.pointed_background_color}"
             )
+
                             + pointer_right,
                             self.pointer_color)[0]
+
             print(pointed_text)
 
         else:

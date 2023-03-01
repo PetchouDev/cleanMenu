@@ -43,6 +43,8 @@ from clean_menu import Menu
 
 menu = Menu(title,  # menu title
             options,  # list of options
+            subtitle="",  # menu subtitle
+            subtitle_color=None,  # subtitle color
             exit_text="Exit",  # exit text
             exit_function=sys.exit,  # exit function called when
             art_title=True,  # enable/disable ascii art title
