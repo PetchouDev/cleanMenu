@@ -76,13 +76,13 @@ menu = Menu("Test",
             pointed_text_color="green",
             exit_text="Quit me forever...",
             text_color="magenta",
-            validation_key="enter",
+            validate_key="enter",
             )
 ```
 will render this :
 
 
-[Click to see the image (redirection)](http://home.petchou.ovh/test1.png)
+[Click to see the image (redirection)](https://petchou.ovh/static/images/cleanMenu.png)
 
 ### Bind actions to options:
 You can attach a function or method to each action in the menu, except for the `exit`, which is  handled by the parameter `exit_function`.
