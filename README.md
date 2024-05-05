@@ -82,7 +82,7 @@ menu = Menu("Test",
 will render this :
 
 
-[Click to see the image (redirection)](https://petchou.ovh/static/images/cleanMenu.png)
+![Click to see the image (redirection)](https://petchou.ovh/static/images/cleanMenu.png)
 
 ### Bind actions to options:
 You can attach a function or method to each action in the menu, except for the `exit`, which is  handled by the parameter `exit_function`.
